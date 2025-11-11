@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - StudyShare</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>📚 StudyShare</h1>
+            </div>
+            <nav class="nav">
+                <a href="/dashboard.html" class="active">Dashboard</a>
+                <a href="/upload.html">Upload</a>
+                <a href="/browse.html">Browse</a>
+                <a href="/groups.html">Groups</a>
+                <div class="user-menu">
+                    <span id="userName">Loading...</span>
+                    <div class="dropdown">
+                        <a href="/profile.html">Profile</a>
+                        <a href="#" id="logoutBtn">Logout</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="dashboard-header">
+            <div class="welcome-section">
+                <h2>Welcome back, <span id="userNameDisplay">User</span>! 👋</h2>
+                <p id="userRoleBadge" class="role-badge">Student</p>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📤</div>
+                <div class="stat-info">
+                    <h3 id="totalUploads">0</h3>
+                    <p>My Uploads</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📥</div>
+                <div class="stat-info">
+                    <h3 id="totalDownloads">0</h3>
+                    <p>Total Downloads</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-info">
+                    <h3 id="totalGroups">0</h3>
+                    <p>Groups Joined</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-info">
+                    <h3 id="popularMaterial">N/A</h3>
+                    <p>Most Popular</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h3>Quick Actions</h3>
+            <div class="action-buttons">
+                <a href="/upload.html" class="action-btn">
+                    <span class="action-icon">📤</span>
+                    <span>Upload Material</span>
+                </a>
+                <a href="/browse.html" class="action-btn">
+                    <span class="action-icon">🔍</span>
+                    <span>Browse Materials</span>
+                </a>
+                <a href="/groups.html" class="action-btn">
+                    <span class="action-icon">👥</span>
+                    <span>My Groups</span>
+                </a>
+                <a href="/profile.html" class="action-btn">
+                    <span class="action-icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- My Recent Uploads -->
+        <div class="recent-section">
+            <h3>My Recent Uploads</h3>
+            <div id="recentUploads" class="materials-grid">
+                <p>Loading your uploads...</p>
+            </div>
+        </div>
+
+        <!-- Admin Section (only for admin/teacher) -->
+        <div id="adminSection" class="admin-section hidden">
+            <h3>📊 Platform Statistics</h3>
+            <div class="admin-stats">
+                <div class="admin-stat-card">
+                    <h4 id="platformUsers">0</h4>
+                    <p>Total Users</p>
+                </div>
+                <div class="admin-stat-card">
+                    <h4 id="platformMaterials">0</h4>
+                    <p>Total Materials</p>
+                </div>
+                <div class="admin-stat-card">
+                    <h4 id="platformTeachers">0</h4>
+                    <p>Teachers</p>
+                </div>
+                <div class="admin-stat-card">
+                    <h4 id="platformStudents">0</h4>
+                    <p>Students</p>
+                </div>
+            </div>
+            <a href="/admin.html" class="btn btn-primary">Go to Admin Panel</a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 StudyShare. Built for engineering students, by students.</p>
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

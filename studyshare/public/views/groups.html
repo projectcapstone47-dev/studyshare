@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Groups - StudyShare</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>📚 StudyShare</h1>
+            </div>
+            <nav class="nav">
+                <a href="/dashboard.html">Dashboard</a>
+                <a href="/upload.html">Upload</a>
+                <a href="/browse.html">Browse</a>
+                <a href="/groups.html" class="active">Groups</a>
+                <div class="user-menu">
+                    <span id="userName">User</span>
+                    <div class="dropdown">
+                        <a href="/profile.html">Profile</a>
+                        <a href="#" id="logoutBtn">Logout</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="groups-header">
+            <h2>Study Groups</h2>
+            <button id="createGroupBtn" class="btn btn-primary" type="button">+ Create Group</button>
+        </div>
+
+        <div id="createGroupForm" class="form-card hidden">
+            <h3>Create New Group</h3>
+            <form id="groupForm">
+                <div class="form-group">
+                    <label for="groupName">Group Name *</label>
+                    <input type="text" id="groupName" required placeholder="e.g., CSE Semester 5 - Group A">
+                </div>
+                <div class="form-group">
+                    <label for="groupDescription">Description</label>
+                    <textarea id="groupDescription" rows="3" placeholder="Brief description of the group..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Create Group</button>
+                    <button type="button" id="cancelGroupBtn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="groupsList" class="groups-grid">
+            <p>Loading groups...</p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 StudyShare. Built for engineering students, by students.</p>
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/groups.js"></script>
+    <script>
+        // Check authentication
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token) {
+                alert('Please login to access groups');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            document.getElementById('userName').textContent = user.name || 'User';
+            
+            // Logout handler
+            document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    await fetch('/api/auth/logout', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/login.html';
+            });
+        });
+    </script>
+</body>
+</html>

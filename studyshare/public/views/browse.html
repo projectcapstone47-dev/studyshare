@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Browse study materials on StudyShare">
+    <title>Browse Materials - StudyShare</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/browse.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>📚 StudyShare</h1>
+            </div>
+            <nav class="nav" id="mainNav">
+                <!-- Will be populated by JavaScript -->
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="browse-header">
+            <h2>Browse Study Materials</h2>
+            
+            <div class="search-filters">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search by title, subject, or uploader..." aria-label="Search materials">
+                    <button id="searchBtn" class="btn btn-secondary" type="button">🔍 Search</button>
+                </div>
+
+                <div class="filters">
+                    <select id="subjectFilter" aria-label="Filter by subject" title="Filter by subject">
+                        <option value="">All Subjects</option>
+                    </select>
+
+                    <select id="semesterFilter" aria-label="Filter by semester" title="Filter by semester">
+                        <option value="">All Semesters</option>
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5">Semester 5</option>
+                        <option value="6">Semester 6</option>
+                        <option value="7">Semester 7</option>
+                        <option value="8">Semester 8</option>
+                    </select>
+
+                    <!-- NEW: Filter by uploader role -->
+                    <select id="roleFilter" aria-label="Filter by uploader role" title="Filter by uploader role">
+                        <option value="">All Materials</option>
+                        <option value="teacher">Teacher Materials ✓</option>
+                        <option value="student">Student Notes</option>
+                    </select>
+
+                    <!-- NEW: Filter by verified -->
+                    <select id="verifiedFilter" aria-label="Filter by verification" title="Filter by verification">
+                        <option value="">All Status</option>
+                        <option value="1">Verified Only ✓</option>
+                        <option value="0">Unverified</option>
+                    </select>
+
+                    <button id="clearFilters" class="btn btn-text" type="button">Clear Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultsInfo" class="results-info">
+            <p>Loading materials...</p>
+        </div>
+
+        <div id="materialsGrid" class="materials-grid">
+            <!-- Materials will be loaded here via JavaScript -->
+        </div>
+
+        <div id="noResults" class="no-results hidden">
+            <p>No materials found. Try adjusting your filters or <a href="/upload.html">upload the first one</a>!</p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 StudyShare. Built for engineering students, by students.</p>
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/browse.js"></script>
+</body>
+</html>

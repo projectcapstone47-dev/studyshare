@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Material - StudyShare</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/upload.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>📚 StudyShare</h1>
+            </div>
+            <nav class="nav">
+                <a href="/dashboard.html">Dashboard</a>
+                <a href="/upload.html" class="active">Upload</a>
+                <a href="/browse.html">Browse</a>
+                <a href="/groups.html">Groups</a>
+                <div class="user-menu">
+                    <span id="userName">User</span>
+                    <div class="dropdown">
+                        <a href="/profile.html">Profile</a>
+                        <a href="#" id="logoutBtn">Logout</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="upload-container">
+            <h2>Upload Study Material</h2>
+            <p class="subtitle">Share your notes, assignments, and study resources with fellow students</p>
+
+            <!-- User Info Display -->
+            <div class="user-info-card">
+                <p><strong>Uploading as:</strong> <span id="uploaderName">Loading...</span></p>
+                <span id="uploaderRole" class="role-badge">student</span>
+            </div>
+
+            <form id="uploadForm" class="upload-form">
+                <div class="form-group">
+                    <label for="title">Material Title *</label>
+                    <input type="text" id="title" name="title" required 
+                           placeholder="e.g., Data Structures Notes - Chapter 3">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="subject">Subject *</label>
+                        <input type="text" id="subject" name="subject" required 
+                               placeholder="e.g., Data Structures" list="subjectsList">
+                        <datalist id="subjectsList"></datalist>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="semester">Semester *</label>
+                        <select id="semester" name="semester" required>
+                            <option value="">Select Semester</option>
+                            <option value="1">Semester 1</option>
+                            <option value="2">Semester 2</option>
+                            <option value="3">Semester 3</option>
+                            <option value="4">Semester 4</option>
+                            <option value="5">Semester 5</option>
+                            <option value="6">Semester 6</option>
+                            <option value="7">Semester 7</option>
+                            <option value="8">Semester 8</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Removed uploadedBy field - now using authenticated user -->
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="visibility">Visibility *</label>
+                        <select id="visibility" name="visibility" required>
+                            <option value="public">Public (Everyone can access)</option>
+                            <option value="group">Group Only</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group hidden" id="groupSelectContainer">
+                        <label for="groupId">Select Group</label>
+                        <select id="groupId" name="groupId">
+                            <option value="">Select a group</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="material">Upload File *</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="material" name="material" required 
+                               accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png">
+                        <label for="material" class="file-upload-label">
+                            <span class="file-icon">📁</span>
+                            <span class="file-text">Choose file or drag here</span>
+                            <span class="file-info">PDF, DOC, PPT, or Image (Max 10MB)</span>
+                        </label>
+                    </div>
+                    <div id="filePreview" class="file-preview"></div>
+                </div>
+
+                <div id="progressContainer" class="progress-container hidden">
+                    <div class="progress-bar">
+                        <div id="progressBar" class="progress-fill"></div>
+                    </div>
+                    <p id="progressText" class="progress-text">Uploading... 0%</p>
+                </div>
+
+                <div id="messageContainer" class="message-container"></div>
+
+                <button type="submit" id="submitBtn" class="btn btn-primary btn-large">
+                    Upload Material
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 StudyShare. Built for engineering students, by students.</p>
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/upload.js"></script>
+</body>
+</html>

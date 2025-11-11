@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - StudyShare</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>📚 StudyShare Admin</h1>
+            </div>
+            <nav class="nav">
+                <a href="/dashboard.html">Dashboard</a>
+                <a href="/admin.html" class="active">Admin Panel</a>
+                <div class="user-menu">
+                    <span id="userName">Admin</span>
+                    <div class="dropdown">
+                        <a href="/profile.html">Profile</a>
+                        <a href="#" id="logoutBtn">Logout</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <h2>🛡️ Admin Panel</h2>
+
+        <!-- Tabs -->
+        <div class="admin-tabs">
+            <button class="tab-btn active" data-tab="users">Users</button>
+            <button class="tab-btn" data-tab="materials">Materials</button>
+            <button class="tab-btn" data-tab="stats">Statistics</button>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="usersTab" class="tab-content active">
+            <div class="admin-section">
+                <h3>User Management</h3>
+                
+                <div class="filter-bar">
+                    <!-- FIXED Issue 1: Added aria-label and title -->
+                    <select id="roleFilter" aria-label="Filter users by role" title="Filter users by role">
+                        <option value="">All Roles</option>
+                        <option value="student">Students</option>
+                        <option value="teacher">Teachers</option>
+                        <option value="admin">Admins</option>
+                    </select>
+                    
+                    <!-- FIXED Issue 2: Added aria-label and title -->
+                    <select id="statusFilter" aria-label="Filter users by status" title="Filter users by status">
+                        <option value="">All Status</option>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </select>
+                    
+                    <button id="filterBtn" class="btn btn-secondary">Apply Filters</button>
+                </div>
+
+                <div id="usersTable" class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Department</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr>
+                                <td colspan="6">Loading users...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Materials Tab -->
+        <div id="materialsTab" class="tab-content hidden">
+            <div class="admin-section">
+                <h3>Materials Management</h3>
+                <div id="materialsTable" class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Subject</th>
+                                <th>Uploaded By</th>
+                                <th>Role</th>
+                                <th>Downloads</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="materialsTableBody">
+                            <tr>
+                                <td colspan="7">Loading materials...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Tab -->
+        <div id="statsTab" class="tab-content hidden">
+            <div class="admin-section">
+                <h3>Platform Statistics</h3>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4 id="statTotalUsers">0</h4>
+                        <p>Total Users</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4 id="statTotalStudents">0</h4>
+                        <p>Students</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4 id="statTotalTeachers">0</h4>
+                        <p>Teachers</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4 id="statTotalMaterials">0</h4>
+                        <p>Total Materials</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4 id="statTotalDownloads">0</h4>
+                        <p>Total Downloads</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4 id="statActiveUsers">0</h4>
+                        <p>Active Users</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 StudyShare. Admin Panel</p>
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script>
+        // Admin panel specific JavaScript
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check admin authentication
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/auth/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (!data.success || data.user.role !== 'admin') {
+                    alert('Admin access only!');
+                    window.location.href = '/dashboard.html';
+                    return;
+                }
+
+                document.getElementById('userName').textContent = data.user.name;
+            } catch (error) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.dataset.tab;
+                    
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+                    
+                    btn.classList.add('active');
+                    document.getElementById(tab + 'Tab').classList.remove('hidden');
+                    
+                    if (tab === 'users') loadUsers();
+                    if (tab === 'materials') loadMaterials();
+                    if (tab === 'stats') loadStats();
+                });
+            });
+
+            // Logout handler
+            document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+                e.preventDefault();
+                const token = localStorage.getItem('token');
+                try {
+                    await fetch('/api/auth/logout', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/login.html';
+            });
+
+            // Load users initially
+            loadUsers();
+        });
+
+        async function loadUsers() {
+            const token = localStorage.getItem('token');
+            const tbody = document.getElementById('usersTableBody');
+            
+            try {
+                const response = await fetch('/api/users', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.success && data.data.length > 0) {
+                    tbody.innerHTML = data.data.map(user => `
+                        <tr>
+                            <td>${escapeHtml(user.name)}</td>
+                            <td>${escapeHtml(user.email)}</td>
+                            <td><span class="role-badge ${user.role}">${user.role}</span></td>
+                            <td>${escapeHtml(user.department || 'N/A')}</td>
+                            <td>${user.is_active ? '<span class="badge badge-success">Active</span>' : '<span class="badge">Inactive</span>'}</td>
+                            <td>
+                                <button onclick="toggleUserStatus(${user.id}, ${user.is_active})" class="btn btn-small">
+                                    ${user.is_active ? 'Deactivate' : 'Activate'}
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6">No users found</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                tbody.innerHTML = '<tr><td colspan="6">Error loading users</td></tr>';
+            }
+        }
+
+        async function loadMaterials() {
+            const token = localStorage.getItem('token');
+            const tbody = document.getElementById('materialsTableBody');
+            
+            try {
+                const response = await fetch('/api/materials', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.success && data.data.length > 0) {
+                    tbody.innerHTML = data.data.map(material => `
+                        <tr>
+                            <td>${escapeHtml(material.title)}</td>
+                            <td>${escapeHtml(material.subject)}</td>
+                            <td>${escapeHtml(material.uploaded_by)}</td>
+                            <td><span class="role-badge ${material.uploader_role}">${material.uploader_role}</span></td>
+                            <td>${material.downloads_count}</td>
+                            <td>${material.is_verified ? '<span class="verified-badge">✓ Verified</span>' : 'Unverified'}</td>
+                            <td>
+                                <button onclick="deleteMaterial(${material.id})" class="btn btn-small btn-danger">Delete</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="7">No materials found</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading materials:', error);
+                tbody.innerHTML = '<tr><td colspan="7">Error loading materials</td></tr>';
+            }
+        }
+
+        async function loadStats() {
+            const token = localStorage.getItem('token');
+            
+            try {
+                const [userStatsRes, materialStatsRes] = await Promise.all([
+                    fetch('/api/users/stats/overview', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch('/api/materials/stats/overview', { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+                
+                const userStats = await userStatsRes.json();
+                const materialStats = await materialStatsRes.json();
+                
+                if (userStats.success) {
+                    document.getElementById('statTotalUsers').textContent = userStats.data.total_users || 0;
+                    document.getElementById('statTotalStudents').textContent = userStats.data.total_students || 0;
+                    document.getElementById('statTotalTeachers').textContent = userStats.data.total_teachers || 0;
+                    document.getElementById('statActiveUsers').textContent = userStats.data.active_users || 0;
+                }
+                
+                if (materialStats.success) {
+                    document.getElementById('statTotalMaterials').textContent = materialStats.data.total_materials || 0;
+                    document.getElementById('statTotalDownloads').textContent = materialStats.data.total_downloads || 0;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        async function toggleUserStatus(userId, currentStatus) {
+            const token = localStorage.getItem('token');
+            const action = currentStatus ? 'deactivate' : 'activate';
+            
+            if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+            
+            try {
+                const response = await fetch(`/api/users/${userId}/${action}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(data.message);
+                    loadUsers();
+                } else {
+                    alert(data.error || 'Action failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Action failed');
+            }
+        }
+
+        async function deleteMaterial(materialId) {
+            const token = localStorage.getItem('token');
+            
+            if (!confirm('Are you sure you want to delete this material?')) return;
+            
+            try {
+                const response = await fetch(`/api/materials/${materialId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(data.message);
+                    loadMaterials();
+                } else {
+                    alert(data.error || 'Delete failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Delete failed');
+            }
+        }
+    </script>
+</body>
+</html>

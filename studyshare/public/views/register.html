@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - StudyShare</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/auth.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>📚 StudyShare</h1>
+                <h2>Create Account</h2>
+                <p>Join our community of learners</p>
+            </div>
+
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" required 
+                           placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required 
+                           placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label for="role">I am a *</label>
+                    <select id="role" name="role" required>
+                        <option value="">Select your role</option>
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <input type="text" id="department" name="department" 
+                               placeholder="e.g., Computer Science">
+                    </div>
+
+                    <div class="form-group" id="semesterGroup">
+                        <label for="semester">Semester</label>
+                        <select id="semester" name="semester">
+                            <option value="">Select Semester</option>
+                            <option value="1">Semester 1</option>
+                            <option value="2">Semester 2</option>
+                            <option value="3">Semester 3</option>
+                            <option value="4">Semester 4</option>
+                            <option value="5">Semester 5</option>
+                            <option value="6">Semester 6</option>
+                            <option value="7">Semester 7</option>
+                            <option value="8">Semester 8</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" 
+                           placeholder="Enter your phone number">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password *</label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Create a strong password">
+                    <small>Min 8 characters, include uppercase, lowercase, and numbers</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password *</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required 
+                           placeholder="Re-enter your password">
+                </div>
+
+                <div id="errorMessage" class="message-box error hidden"></div>
+                <div id="successMessage" class="message-box success hidden"></div>
+
+                <button type="submit" id="registerBtn" class="btn btn-primary btn-large">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Already have an account? <a href="/login.html">Login here</a></p>
+                <p><a href="/">← Back to Home</a></p>
+            </div>
+        </div>
+
+        <div class="auth-info">
+            <h3>🚀 Why Join StudyShare?</h3>
+            <ul>
+                <li>📚 Access quality study materials</li>
+                <li>👥 Collaborate with peers</li>
+                <li>✅ Verified teacher content</li>
+                <li>🔒 Secure and private</li>
+                <li>📱 Works on all devices</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/auth.js"></script>
+</body>
+</html>
