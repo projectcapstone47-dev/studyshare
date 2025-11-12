@@ -1,88 +1,65 @@
-require('dotenv').config();
+// scripts/run-migrations.js
 const fs = require('fs');
 const path = require('path');
-const { db } = require('../src/config/database');
+const sqlite3 = require('sqlite3').verbose();
 
-const MIGRATIONS_DIR = path.join(__dirname, '../database/migrations');
+const dbFile = process.env.DATABASE_FILE || path.join(process.cwd(), 'database', 'studyshare.db');
+const migrationsDir = path.join(process.cwd(), 'database', 'migrations');
 
-async function runMigrations() {
-    console.log('🔄 Running database migrations...\n');
-
-    try {
-        // Get all migration files
-        const files = fs.readdirSync(MIGRATIONS_DIR)
-            .filter(file => file.endsWith('.sql'))
-            .sort();
-
-        if (files.length === 0) {
-            console.log('📭 No migration files found.');
-            return;
+function runSql(db, sql) {
+  return new Promise((resolve, reject) => {
+    db.exec(sql, (err) => {
+      if (err) {
+        // For ALTER TABLE ADD COLUMN, SQLite will error if column exists.
+        // We'll surface the error but not fail for "duplicate column" or "already exists" types.
+        const msg = String(err.message).toLowerCase();
+        if (msg.includes('duplicate column') || msg.includes('already exists') || msg.includes('has no column named')) {
+          console.warn('Migration warning (ignored):', err.message);
+          return resolve(); // ignore and continue
         }
-
-        // Run each migration
-        for (const file of files) {
-            console.log(`📄 Running migration: ${file}`);
-            
-            const filePath = path.join(MIGRATIONS_DIR, file);
-            const sql = fs.readFileSync(filePath, 'utf8');
-
-            // Split by semicolon and run each statement separately
-            const statements = sql
-                .split(';')
-                .map(s => s.trim())
-                .filter(s => s.length > 0 && !s.startsWith('--'));
-
-            for (const statement of statements) {
-                try {
-                    await new Promise((resolve, reject) => {
-                        db.run(statement, (err) => {
-                            if (err) {
-                                // Ignore "duplicate column" errors (already exists)
-                                if (err.message.includes('duplicate column name')) {
-                                    console.log(`   ⚠️  Column already exists, skipping...`);
-                                    resolve();
-                                } else {
-                                    reject(err);
-                                }
-                            } else {
-                                resolve();
-                            }
-                        });
-                    });
-                } catch (stmtError) {
-                    console.error(`   ⚠️  Warning: ${stmtError.message}`);
-                    // Continue with next statement
-                }
-            }
-
-            console.log(`   ✅ Completed: ${file}\n`);
-        }
-
-        console.log('✅ All migrations completed successfully!\n');
-        
-        // Show summary
-        console.log('📊 Database Summary:');
-        db.all("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name", [], (err, tables) => {
-            if (!err) {
-                console.log(`   Tables created: ${tables.length}`);
-                tables.forEach(table => {
-                    console.log(`   ✓ ${table.name}`);
-                });
-            }
-            
-            console.log('\n🎉 Migration process complete!');
-            console.log('\n📝 Default credentials:');
-            console.log('   Email: admin@studyshare.com');
-            console.log('   Password: Admin@123\n');
-            
-            process.exit(0);
-        });
-
-    } catch (error) {
-        console.error('❌ Migration failed:', error.message);
-        process.exit(1);
-    }
+        return reject(err);
+      }
+      resolve();
+    });
+  });
 }
 
-// Run migrations
-runMigrations();
+async function runAll() {
+  if (!fs.existsSync(migrationsDir)) {
+    console.log('No migrations directory found:', migrationsDir);
+    process.exit(0);
+  }
+
+  const files = fs.readdirSync(migrationsDir)
+    .filter(f => f.endsWith('.sql'))
+    .sort(); // rely on numeric prefix
+
+  if (files.length === 0) {
+    console.log('No migration files found.');
+    process.exit(0);
+  }
+
+  // ensure directory for DB exists
+  const dbDir = path.dirname(dbFile);
+  if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
+
+  const db = new sqlite3.Database(dbFile);
+  try {
+    // run each file sequentially
+    for (const f of files) {
+      const fp = path.join(migrationsDir, f);
+      const sql = fs.readFileSync(fp, 'utf8');
+      console.log('Running migration:', f);
+      await runSql(db, sql);
+    }
+    console.log('✅ All migrations executed (or safely ignored).');
+    db.close();
+    process.exit(0);
+  } catch (err) {
+    console.error('❌ Migration failed:', err);
+    db.close();
+    process.exit(1);
+  }
+}
+
+runAll();

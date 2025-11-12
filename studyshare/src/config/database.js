@@ -1,86 +1,56 @@
-const sqlite3 = require('sqlite3').verbose();
+// src/config/database.js
 const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
+const { spawnSync } = require('child_process');
 
-const DB_PATH = process.env.DB_PATH || './database/studyshare.db';
+const dbFile = process.env.DATABASE_FILE || path.join(process.cwd(), 'database', 'studyshare.db');
 
-// Create database connection
-const db = new sqlite3.Database(DB_PATH, (err) => {
-    if (err) {
-        console.error('Database connection error:', err.message);
-    } else {
-        console.log('📦 Connected to SQLite database');
+function getDb() {
+  // open in serialized mode to avoid concurrency issues during migrations
+  const db = new sqlite3.Database(dbFile);
+  return db;
+}
+
+async function initializeDatabase() {
+  return new Promise((resolve, reject) => {
+    try {
+      // Ensure folder exists
+      const dbDir = path.dirname(dbFile);
+      const fs = require('fs');
+      if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
+
+      // Run migrations synchronously using node script
+      console.log('Running migrations via scripts/run-migrations.js');
+      const result = spawnSync('node', [path.join(process.cwd(), 'scripts', 'run-migrations.js')], {
+        stdio: 'inherit',
+        env: process.env,
+        shell: false,
+      });
+
+      if (result.status !== 0) {
+        return reject(new Error('Migrations failed. See logs above.'));
+      }
+
+      // open the DB after migrations
+      const db = getDb();
+      // optional: you can test a simple query to confirm DB responds
+      db.get("SELECT name FROM sqlite_master WHERE type='table' LIMIT 1", (err/*, row*/) => {
+        if (err) {
+          db.close();
+          return reject(err);
+        }
+        db.close();
+        console.log('Database initialized at', dbFile);
+        resolve();
+      });
+    } catch (err) {
+      reject(err);
     }
-});
+  });
+}
 
-// Initialize database schema
-const initializeDatabase = () => {
-    return new Promise((resolve, reject) => {
-        db.serialize(() => {
-            // Materials table
-            db.run(`
-                CREATE TABLE IF NOT EXISTS materials (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    title TEXT NOT NULL,
-                    subject TEXT NOT NULL,
-                    semester TEXT NOT NULL,
-                    uploaded_by TEXT NOT NULL,
-                    visibility TEXT NOT NULL DEFAULT 'public',
-                    group_id INTEGER,
-                    file_path TEXT NOT NULL,
-                    file_name TEXT NOT NULL,
-                    file_type TEXT,
-                    file_size INTEGER,
-                    upload_timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    downloads_count INTEGER DEFAULT 0,
-                    FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE
-                )
-            `, (err) => {
-                if (err) reject(err);
-            });
-
-            // Groups table
-            db.run(`
-                CREATE TABLE IF NOT EXISTS groups (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL UNIQUE,
-                    description TEXT,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                )
-            `, (err) => {
-                if (err) reject(err);
-            });
-
-            // Subjects table
-            db.run(`
-                CREATE TABLE IF NOT EXISTS subjects (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL UNIQUE,
-                    department TEXT,
-                    semester TEXT
-                )
-            `, (err) => {
-                if (err) reject(err);
-            });
-
-            // Group members table (for tracking who belongs to which group)
-            db.run(`
-                CREATE TABLE IF NOT EXISTS group_members (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    group_id INTEGER NOT NULL,
-                    member_name TEXT NOT NULL,
-                    joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE
-                )
-            `, (err) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    console.log('✅ Database schema initialized');
-                    resolve();
-                }
-            });
-        });
-    });
+module.exports = {
+  dbFile,
+  getDb,
+  initializeDatabase,
 };
-
-module.exports = { db, initializeDatabase };
